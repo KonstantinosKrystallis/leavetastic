@@ -1,0 +1,25 @@
+﻿@inherits LayoutComponentBase
+
+<RadzenDialog />
+<RadzenNotification />
+<RadzenContextMenu />
+<RadzenTooltip />
+
+<RadzenLayout>
+    <RadzenHeader>
+        <RadzenSidebarToggle Click="@(()=>sidebarExpanded = !sidebarExpanded)"></RadzenSidebarToggle>
+    </RadzenHeader>
+    <RadzenSidebar @bind-Expanded=sidebarExpanded>
+
+    </RadzenSidebar>
+    <RadzenBody>
+
+    </RadzenBody>
+    <RadzenFooter>
+
+    </RadzenFooter>
+</RadzenLayout>
+
+@code {
+    private bool sidebarExpanded { get; set; }
+}
