@@ -1,11 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Radzen;
-using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Json;
 
 namespace LeaveTastic.Common.Services
 {
-    public class HttpBaseService<T> : HttpClient where T : class, new()
+    public class HttpBaseService<T> where T : class, new()
     {
         protected readonly HttpClient _httpClient;
         protected readonly NotificationService _notificationService;
@@ -14,10 +13,10 @@ namespace LeaveTastic.Common.Services
 
         public string BaseUrl { get; protected set; }
 
-        public HttpBaseService(HttpClient httpClient, IConfiguration configuration, NotificationService notificationService)
+        public HttpBaseService(IHttpClientFactory httpClientFactory, IConfiguration configuration, NotificationService notificationService)
         {
-            BaseUrl = httpClient.BaseAddress.ToString();
-            _httpClient = httpClient;
+            _httpClient = httpClientFactory.CreateClient("LeaveTastic.PublicServerAPI");
+            BaseUrl = _httpClient.BaseAddress.ToString();
             _notificationService = notificationService;
         }
 
