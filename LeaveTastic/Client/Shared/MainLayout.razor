@@ -10,10 +10,10 @@
         <RadzenSidebarToggle Click="@(()=>sidebarExpanded = !sidebarExpanded)"></RadzenSidebarToggle>
     </RadzenHeader>
     <RadzenSidebar @bind-Expanded=sidebarExpanded>
-
+        <NavMenu />
     </RadzenSidebar>
     <RadzenBody>
-
+        @Body
     </RadzenBody>
     <RadzenFooter>
 
