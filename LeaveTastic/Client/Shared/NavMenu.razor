@@ -1,4 +1,4 @@
-﻿<RadzenPanelMenu>
+﻿@*<RadzenPanelMenu>
     <AuthorizeView>
         <Authorized>
             <RadzenPanelMenuItem Icon="home" Path="/" Text="Home" />
@@ -11,6 +11,10 @@
         </NotAuthorized>
     </AuthorizeView>
 </RadzenPanelMenu>
-@code {
+*@
 
-}
+<RadzenPanelMenu>
+    <RadzenPanelMenuItem Icon="home" Path="/" Text="Home" />
+    <RadzenPanelMenuItem Icon="add" Path="/counter" Text="Counter" />
+    <RadzenPanelMenuItem Icon="thermostat" Path="/fetchdata" Text="Fetch Data" />
+</RadzenPanelMenu>

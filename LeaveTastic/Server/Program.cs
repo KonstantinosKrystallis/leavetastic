@@ -8,22 +8,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false)
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+//builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddIdentityServer().AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
+//builder.Services.AddIdentityServer().AddApiAuthorization<ApplicationUser, ApplicationDbContext>();
 
-builder.Services.AddAuthentication().AddIdentityServerJwt();
+//builder.Services.AddAuthentication().AddIdentityServerJwt();
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddControllers();
 builder.Services.AddRazorPages();
 
-builder.Services.AddSwaggerGen(options =>{
+builder.Services.AddSwaggerGen(options =>
+{
     options.SwaggerDoc("v1", new OpenApiInfo
     {
         Version = "v1",
@@ -55,9 +54,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseIdentityServer();
-app.UseAuthorization();
-app.UseAuthentication();
+//app.UseIdentityServer();
+//app.UseAuthorization();
+//app.UseAuthentication();
 
 
 app.MapRazorPages();
