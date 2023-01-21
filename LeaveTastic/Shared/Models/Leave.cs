@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace LeaveTastic.Shared.Models
 {
-    public class Role
+    public class Leave
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public DateTime DateOfLeave { get; set; }
 
-        public virtual IEnumerable<UserRole> Users { get; set; }
+        public virtual User User { get; set; }
     }
 }

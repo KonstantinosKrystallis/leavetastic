@@ -9,12 +9,12 @@ namespace LeaveTastic.Shared.Models
 {
     public class User
     {
-        [Key]
         public int Id { get; set; }
         public string Name { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
+        public int? ManagerId { get; set; }
+
 
         public virtual UserRole Role { get; set; }
+        public virtual IEnumerable<Leave> Leaves { get; set; }
     }
 }
