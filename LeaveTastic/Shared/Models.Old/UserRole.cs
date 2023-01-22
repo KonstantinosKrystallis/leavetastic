@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace LeaveTastic.Shared.Models
+namespace LeaveTastic.Shared.Models.Old
 {
     public class UserRole
     {

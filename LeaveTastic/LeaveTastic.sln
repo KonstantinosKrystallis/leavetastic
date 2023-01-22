@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LeaveTastic.Client", "Clien
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LeaveTastic.Shared", "Shared\LeaveTastic.Shared.csproj", "{7D9B8295-DF3E-49C7-8391-C1E04C19895D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LeaveTastic.Common", "Common\LeaveTastic.Common.csproj", "{C2A5C53C-B406-4BCB-916D-05B2ACA87569}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LeaveTastic.Common", "Common\LeaveTastic.Common.csproj", "{C2A5C53C-B406-4BCB-916D-05B2ACA87569}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{47F902D0-B41C-463D-9FFE-67FAB7F0C1D4}"
 EndProject

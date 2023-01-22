@@ -1,9 +1,47 @@
 ﻿@page "/"
+@implements IDisposable
 
-<PageTitle>Index</PageTitle>
+@switch (selectedEmploy.RoleId)
+{
+    case 1:
+        <EmployPage></EmployPage>
+        break;
+    case 2:
+        <ManagerPage></ManagerPage>
+        break;
+    case 3:
+        <HumanResourcesPage></HumanResourcesPage>
+        break;
+    default:
+        <PageTitle>Index</PageTitle>
+        <RadzenText TextStyle=TextStyle.DisplayH3 Text="Hello, world!." />
+        <RadzenText TextStyle=TextStyle.Body2 Text="Welcome to your new app." />
+        <SurveyPrompt Title="How is Blazor working for you?" />
+        break;
+}
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+@code {
+    [Inject]
+    private HelperService helperService { get; set; } = default!;
+
+    private Employee selectedEmploy { get; set; } = new();
+
+    protected async override Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        helperService.SelectedEmployeeChanged += EmploySelected;
+    }
+
+    private void EmploySelected(Employee employee)
+    {
+        selectedEmploy = employee;
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        helperService.SelectedEmployeeChanged -= EmploySelected;
+    }
+}

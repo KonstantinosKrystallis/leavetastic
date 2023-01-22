@@ -6,8 +6,9 @@
 <RadzenTooltip />
 
 <RadzenLayout>
-    <RadzenHeader>
+    <RadzenHeader class="d-flex align-items-center">
         <RadzenSidebarToggle Click="@(()=>sidebarExpanded = !sidebarExpanded)"></RadzenSidebarToggle>
+        <RadzenDropDown TValue=int Data="employees" TextProperty="Name" ValueProperty="Id" ValueChanged="EmployeeSelected" />
     </RadzenHeader>
     <RadzenSidebar @bind-Expanded=sidebarExpanded>
         <NavMenu />
@@ -15,11 +16,27 @@
     <RadzenBody>
         @Body
     </RadzenBody>
-    <RadzenFooter>
-
-    </RadzenFooter>
 </RadzenLayout>
 
 @code {
+    [Inject]
+    HelperService helperService { get; set; } = default!;
+
     private bool sidebarExpanded { get; set; }
+    private List<Employee> employees { get; set; } = new();
+    private Employee selectedEmployee { get; set; } = new();
+
+    protected async override Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        var list = await helperService.HttpService.Get<List<Employee>>("api/employee");
+        employees.AddRange(list);
+    }
+
+    private async void EmployeeSelected(int employeeId)
+    {
+        var employee = await helperService.HttpService.Get<Employee>("api/employee/" + employeeId);
+        helperService.SelectEmployee(employee);
+    }
 }

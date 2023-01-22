@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Radzen;
 using System.Net.Http.Json;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace LeaveTastic.Common.Services
 {
@@ -76,7 +78,7 @@ namespace LeaveTastic.Common.Services
 
         private async Task<T> BaseSend<T>(HttpRequestMessage httpRequestMessage, bool showSuccessNotfication = false, string notificationMessage = successActionMessage) where T : class, new()
         {
-            T response = new();
+            T? response = new();
             try
             {
                 //httpRequestMessage.SetBrowserRequestMode();

@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace LeaveTastic.Shared.Models
+namespace LeaveTastic.Shared.Models;
+
+public partial class Role
 {
-    public class Role
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
+    public int Id { get; set; }
 
-        public virtual IEnumerable<UserRole> Users { get; set; }
-    }
+    public string Name { get; set; } = null!;
+
+    public virtual ICollection<Employee> Employees { get; } = new List<Employee>();
 }

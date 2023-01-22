@@ -1,4 +1,5 @@
 ﻿
+using LeaveTastic.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using Radzen;
 
@@ -9,6 +10,8 @@ namespace LeaveTastic.Common.Services
     /// </summary>
     public class HelperService
     {
+        #region Services
+
         //Radzen services
         public readonly DialogService DialogService;
         public readonly NotificationService NotificationService;
@@ -28,6 +31,16 @@ namespace LeaveTastic.Common.Services
             ContextMenuService = contextMenuService;
             NavigationManager = navigationManager;
             HttpService = httpService;
+        }
+
+        #endregion
+
+        public Employee SelectedUser { get; set; }
+        public event Action<Employee> SelectedEmployeeChanged;
+
+        public void SelectEmployee(Employee employee)
+        {
+            SelectedEmployeeChanged.Invoke(employee);
         }
     }
 }

@@ -4,8 +4,9 @@ services:
   leavetastic.server:
     image: ${DOCKER_REGISTRY-}leavetasticserver
     build:
-      context: .
-      dockerfile: Server/Dockerfile
+        context: .
+        dockerfile: Server/Dockerfile
+        
   leavetastic.database:
     image: "mcr.microsoft.com/mssql/server:2022-latest"
     ports:
@@ -13,3 +14,8 @@ services:
     environment:
         SA_PASSWORD: "S3cur3P@ssW0rd!"
         ACCEPT_EULA: "Y"
+    volumes:
+        - leavetastic-datavolume:/var/lib/mysql  
+
+volumes:
+  leavetastic-datavolume:
