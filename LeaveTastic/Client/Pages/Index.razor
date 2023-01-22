@@ -1,7 +1,11 @@
 ﻿@page "/"
-@implements IDisposable
 
-@switch (selectedEmploy.RoleId)
+<RadzenCard class="d-flex align-items-center ">
+    <RadzenText  class="my-0 mx-3" TextStyle=TextStyle.DisplayH6 Text="Select user"></RadzenText>
+    <RadzenDropDown TValue=int Data="employees" TextProperty="Name" ValueProperty="Id" ValueChanged="EmployeeSelected" />
+</RadzenCard>
+
+@switch (helperService.SelectedEmployee.RoleId)
 {
     case 1:
         <EmployPage></EmployPage>
@@ -20,28 +24,27 @@
         break;
 }
 
-
-
-@code {
+@code{
     [Inject]
-    private HelperService helperService { get; set; } = default!;
+    HelperService helperService { get; set; } = default!;
 
-    private Employee selectedEmploy { get; set; } = new();
+    private List<Employee> employees { get; set; } = new();
+    private Employee selectedEmployee { get; set; } = new();
+
+    private bool isVisible = true;
 
     protected async override Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        helperService.SelectedEmployeeChanged += EmploySelected;
+
+        var list = await helperService.HttpService.Get<List<Employee>>("api/employee"); //Get list of all employees
+        employees.AddRange(list);
     }
 
-    private void EmploySelected(Employee employee)
+    private async Task EmployeeSelected(int employeeId)
     {
-        selectedEmploy = employee;
+        Employee? employee = employees.Where(x => x.Id == employeeId).FirstOrDefault();
+        await helperService.SelectEmployee(employee);
         StateHasChanged();
-    }
-
-    public void Dispose()
-    {
-        helperService.SelectedEmployeeChanged -= EmploySelected;
     }
 }

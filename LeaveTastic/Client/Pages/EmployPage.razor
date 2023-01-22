@@ -1,5 +1,67 @@
-﻿<h3>EmployPage</h3>
+﻿@inherits RadzenComponent
+
+<RadzenCard>
+    <RadzenText TextStyle=TextStyle.DisplayH6 Text="Employee's Leaves"></RadzenText>
+
+    <RadzenDataGrid @ref=radzenDataGrid class="w-100" Data="leaves" TItem=Leave AllowSorting=true>
+        <EmptyTemplate>
+            <p style="color: lightgrey; font-size: 24px; text-align: center; margin: 2rem;">No records to display.</p>
+        </EmptyTemplate>
+        <Columns>
+            <RadzenDataGridColumn TItem="Leave" Property="Id" Width="100px" Title="Id"> </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Leave" Property="DateOfLeave" Title="Date"> </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Leave" Property="IsApproved" Width="100px" Title="Approved"> </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</RadzenCard>
 
 @code {
+    [Inject]
+    HelperService helperService { get; set; } = default!;
 
+    private RadzenDataGrid<Leave>? radzenDataGrid { get; set; } = default!;
+
+    private Employee selectedEmploy { get; set; }
+    private List<Leave> leaves { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        selectedEmploy = helperService.SelectedEmployee ?? new();
+        await GetLeaves();
+
+        helperService.SelectedEmployeeChanged += EmploySelected;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    public void Dispose()
+    {
+        helperService.SelectedEmployeeChanged -= EmploySelected;
+    }
+
+    private async void EmploySelected(Employee employee)
+    {
+        selectedEmploy = employee;
+        await GetLeaves();
+        await radzenDataGrid.Reload();
+        StateHasChanged();
+    }
+
+    private async Task GetLeaves()
+    {
+        var result = await helperService.HttpService.Get<List<Leave>>($"api/leave/emp/{selectedEmploy.Id}");
+        if (result != null)
+        {
+            leaves = new();
+            foreach (var item in result)
+            {
+                leaves.Add(item);
+            }
+        }
+    }
 }

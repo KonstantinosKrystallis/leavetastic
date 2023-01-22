@@ -1,10 +1,6 @@
 using LeaveTastic.Server.Data;
-using LeaveTastic.Server.Models;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
-using System.Diagnostics;
-using System.Text.RegularExpressions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +21,15 @@ builder.Services.AddControllers();
 builder.Services.AddRazorPages();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Version = "v1",
+        Title = "LeaveTastic Base Services API."
+    });
+});
 
 var app = builder.Build();
 

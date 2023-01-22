@@ -14,16 +14,23 @@ namespace LeaveTastic.Server.Controllers
             this.dbContext = dbContext;
         }
 
-        [HttpGet]
-        public IEnumerable<Leave> Get()
+        [HttpGet("all")]
+        public IEnumerable<Leave> GetAll()
         {
             return dbContext.Leaves.ToList();
         }
 
         [HttpGet("{id}")]
-        public Leave? Get(int id)
+        public Leave? GetLeave(int id)
         {
             return dbContext.Leaves.Where(x => x.Id == id).FirstOrDefault();
+        }
+
+        [HttpGet("emp/{id}")]
+        public IEnumerable<Leave>? GetEmployeeLeaves(int id)
+        {
+            var t =  dbContext.Leaves.Where(x => x.EmployeeId == id).ToList();
+            return t;
         }
 
         [HttpPost("{id}")]
@@ -40,6 +47,7 @@ namespace LeaveTastic.Server.Controllers
             dbContext.SaveChanges();
         }
 
+        [HttpDelete]
         public void Delete(int id)
         {
             Leave? leave = dbContext.Leaves.Where(x => x.Id == id).FirstOrDefault();

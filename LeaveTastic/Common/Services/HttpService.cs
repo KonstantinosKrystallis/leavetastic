@@ -5,6 +5,6 @@ namespace LeaveTastic.Common.Services
 {
     public class HttpService : HttpBaseService<object>
     {
-        public HttpService(IHttpClientFactory httpClientFactory, IConfiguration configuration, NotificationService notificationService) : base(httpClientFactory, configuration, notificationService) { }
+        public HttpService(HttpClient httpClient, IConfiguration configuration, NotificationService notificationService) : base(httpClient, configuration, notificationService) { }
     }
 }

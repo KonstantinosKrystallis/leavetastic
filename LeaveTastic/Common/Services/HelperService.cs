@@ -35,12 +35,14 @@ namespace LeaveTastic.Common.Services
 
         #endregion
 
-        public Employee SelectedUser { get; set; }
+        public Employee SelectedEmployee { get; set; } = new();
         public event Action<Employee> SelectedEmployeeChanged;
 
-        public void SelectEmployee(Employee employee)
+        public Task SelectEmployee(Employee employee)
         {
-            SelectedEmployeeChanged.Invoke(employee);
+            SelectedEmployee = employee;
+            SelectedEmployeeChanged?.Invoke(employee);
+            return Task.CompletedTask;
         }
     }
 }
