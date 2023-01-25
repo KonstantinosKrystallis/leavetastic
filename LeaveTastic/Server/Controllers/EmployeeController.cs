@@ -2,6 +2,7 @@
 using LeaveTastic.Server.Models;
 using LeaveTastic.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -20,37 +21,37 @@ namespace LeaveTastic.Server.Controllers
 
         // GET: api/<UserController>
         [HttpGet]
-        public IEnumerable<Employee> Get()
+        public DataResponse<IEnumerable<Employee>> Get()
         {
-
-            var employees = dbContext.Employees.ToList();
-            return employees;
+            return new() { Data = dbContext.Employees.ToList() };
         }
 
         // GET api/<UserController>/5
         [HttpGet("{id}")]
-        public Employee? Get(int id)
+        public DataResponse<Employee> Get(int id)
         {
-            Employee? employee = dbContext.Employees.Where(x => x.Id == id).FirstOrDefault();
-            return employee;
+            return new() { Data = dbContext.Employees.Where(x => x.Id == id).FirstOrDefault() };
         }
 
         // POST api/<UserController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public BaseResponse Post([FromBody] string value)
         {
+            return new();
         }
 
         // PUT api/<UserController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public BaseResponse Put(int id, [FromBody] string value)
         {
+            return new();
         }
 
         // DELETE api/<UserController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public BaseResponse Delete(int id)
         {
+            return new();
         }
     }
 }

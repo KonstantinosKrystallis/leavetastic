@@ -1,35 +1,26 @@
 ﻿@page "/"
 
 <RadzenCard class="d-flex align-items-center ">
-    <RadzenText  class="my-0 mx-3" TextStyle=TextStyle.DisplayH6 Text="Select user"></RadzenText>
-    <RadzenDropDown TValue=int Data="employees" TextProperty="Name" ValueProperty="Id" ValueChanged="EmployeeSelected" />
+    <RadzenText class="my-0 mx-3" TextStyle=TextStyle.DisplayH6 Text="Select user"></RadzenText>
+    <RadzenDropDown TValue=int Data="employees" TextProperty="Name" ValueProperty="Id" Value="helperService.SelectedEmployee.Id" ValueChanged="EmployeeSelected" />
 </RadzenCard>
 
-@switch (helperService.SelectedEmployee.RoleId)
+@if (helperService.SelectedEmployee.RoleId != null)
 {
-    case 1:
-        <EmployPage></EmployPage>
-        break;
-    case 2:
-        <ManagerPage></ManagerPage>
-        break;
-    case 3:
-        <HumanResourcesPage></HumanResourcesPage>
-        break;
-    default:
-        <PageTitle>Index</PageTitle>
-        <RadzenText TextStyle=TextStyle.DisplayH3 Text="Hello, world!." />
-        <RadzenText TextStyle=TextStyle.Body2 Text="Welcome to your new app." />
-        <SurveyPrompt Title="How is Blazor working for you?" />
-        break;
+    <EmployPage></EmployPage>
+}
+else
+{
+    <PageTitle>Index</PageTitle>
+    <RadzenText TextStyle=TextStyle.DisplayH3 Text="Select user" />
+    <RadzenText TextStyle=TextStyle.Body2 Text="You must select a user, in order to use the app" />
 }
 
-@code{
+@code {
     [Inject]
     HelperService helperService { get; set; } = default!;
 
     private List<Employee> employees { get; set; } = new();
-    private Employee selectedEmployee { get; set; } = new();
 
     private bool isVisible = true;
 
@@ -37,8 +28,11 @@
     {
         await base.OnInitializedAsync();
 
-        var list = await helperService.HttpService.Get<List<Employee>>("api/employee"); //Get list of all employees
-        employees.AddRange(list);
+        var response = await helperService.HttpService.Get<DataResponse<List<Employee>>>("api/employee"); //Get list of all employees
+        if (!response.HasError)
+        {
+            employees.AddRange(response.Data);
+        }
     }
 
     private async Task EmployeeSelected(int employeeId)

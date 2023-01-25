@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using LeaveTastic.Shared.Models;
+using Microsoft.Extensions.Configuration;
 using Radzen;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -6,7 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace LeaveTastic.Common.Services
 {
-    public class HttpBaseService<Type> where Type : notnull, new()
+    public class HttpBaseService<Type> where Type : BaseResponse, new()
     {
         protected readonly HttpClient _httpClient;
         protected readonly NotificationService _notificationService;

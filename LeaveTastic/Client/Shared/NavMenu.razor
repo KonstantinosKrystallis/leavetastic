@@ -1,20 +1,5 @@
-﻿@*<RadzenPanelMenu>
-    <AuthorizeView>
-        <Authorized>
-            <RadzenPanelMenuItem Icon="home" Path="/" Text="Home" />
-            <RadzenPanelMenuItem Icon="add" Path="/counter" Text="Counter" />
-            <RadzenPanelMenuItem Icon="thermostat" Path="/fetchdata" Text="Fetch Data" />
-        </Authorized>
-        <NotAuthorized>
-            <RadzenPanelMenuItem Icon="login" Path="/authentication/login" Text="Login" />
-            <RadzenPanelMenuItem Icon="edit" Path="/authentication/register" Text="Register" />
-        </NotAuthorized>
-    </AuthorizeView>
-</RadzenPanelMenu>
-*@
-
-<RadzenPanelMenu>
+﻿<RadzenPanelMenu>
     <RadzenPanelMenuItem Icon="home" Path="/" Text="Home" />
-    <RadzenPanelMenuItem Icon="add" Path="/counter" Text="Counter" />
-    <RadzenPanelMenuItem Icon="thermostat" Path="/fetchdata" Text="Fetch Data" />
+    <RadzenPanelMenuItem Icon="add" Path="/manager" Text="Manager View" />
+    <RadzenPanelMenuItem Icon="thermostat" Path="/hrmanager" Text="HR Manager View" />
 </RadzenPanelMenu>

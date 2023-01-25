@@ -21,22 +21,22 @@ namespace LeaveTastic.Server.Controllers
         }
 
         [HttpGet("{id}")]
-        public Leave? GetLeave(int id)
+        public DataResponse<Leave> GetLeave(int id)
         {
-            return dbContext.Leaves.Where(x => x.Id == id).FirstOrDefault();
+            return new() { Data = dbContext.Leaves.Where(x => x.Id == id).FirstOrDefault() };
         }
 
         [HttpGet("emp/{id}")]
-        public IEnumerable<Leave>? GetEmployeeLeaves(int id)
+        public DataResponse<IEnumerable<Leave>> GetEmployeeLeaves(int id)
         {
-            var t = dbContext.Leaves.Where(x => x.EmployeeId == id).ToList();
-            return t;
+            return new() { Data = dbContext.Leaves.Where(x => x.EmployeeId == id).ToList() };
         }
 
         [HttpPost]
         public async Task<BaseResponse> Post([FromBody] Leave leave)
         {
             await dbContext.Leaves.AddAsync(new(leave));
+            await dbContext.SaveChangesAsync();
             return new();
         }
 
@@ -53,6 +53,7 @@ namespace LeaveTastic.Server.Controllers
         {
             Leave? leave = dbContext.Leaves.Where(x => x.Id == id).FirstOrDefault();
             dbContext.Leaves.Remove(leave);
+            await dbContext.SaveChangesAsync();
             return new();
         }
     }

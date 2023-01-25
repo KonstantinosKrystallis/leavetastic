@@ -1,5 +1,21 @@
-﻿<h3>HumanResourcesPage</h3>
+﻿@page "/hrmanager"
+
+<h3>HumanResourcesPage</h3>
 
 @code {
+    [Inject]
+    HelperService helperService { get; set; } = default!;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        int? roleId = helperService.SelectedEmployee.RoleId;
+
+        if (roleId != 3)
+        {
+            helperService.NotificationService.Notify(NotificationSeverity.Warning, "Invalid user.", "Please select a HR manager user,in order to view this page", 6000);
+            helperService.NavigationManager.NavigateTo("/");
+        }
+    }
 }

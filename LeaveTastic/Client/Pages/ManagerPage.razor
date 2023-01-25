@@ -1,5 +1,22 @@
-﻿<h3>ManagerPage</h3>
+﻿@page "/manager"
+
+<h3>ManagerPage</h3>
 
 @code {
+    [Inject]
+    HelperService helperService { get; set; } = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        int? roleId = helperService.SelectedEmployee.RoleId;
+
+        if (roleId != 2 && roleId != 3)
+        {
+            helperService.NotificationService.Notify(NotificationSeverity.Warning, "Invalid user.", "Please select a manager user,in order to view this page", 6000);
+            helperService.NavigationManager.NavigateTo("/");
+        }
+    }
 
 }
