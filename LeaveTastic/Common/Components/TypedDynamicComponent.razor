@@ -1,0 +1,10 @@
+﻿@typeparam T where T : ComponentBase
+
+<DynamicComponent Type="innerType" Parameters="@this.Parameters"></DynamicComponent>
+
+@code {
+    [Parameter]
+    public IDictionary<string, object> Parameters { get; set; }
+
+    Type innerType = typeof(T); 
+}

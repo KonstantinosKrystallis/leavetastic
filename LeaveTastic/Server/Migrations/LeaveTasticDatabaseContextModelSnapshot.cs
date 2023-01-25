@@ -123,8 +123,11 @@ namespace LeaveTastic.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("DateOfLeave")
+                    b.Property<DateTime>("FromDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ToDate")
+                      .HasColumnType("datetime2");
 
                     b.Property<int>("EmployeeId")
                         .HasColumnType("int");

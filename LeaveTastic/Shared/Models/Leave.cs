@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 
 namespace LeaveTastic.Shared.Models;
 
@@ -9,11 +12,22 @@ public partial class Leave
 
     public int EmployeeId { get; set; }
 
-    public DateTime DateOfLeave { get; set; }
+    public DateTime FromDate { get; set; } = DateTime.Now;
+
+    public DateTime ToDate { get; set; } = DateTime.Now;
 
     public bool? IsApproved { get; set; }
 
     public bool? IsDeleted { get; set; }
 
     public virtual Employee Employee { get; set; } = null!;
+
+    public Leave() { }
+
+    public Leave (Leave leave)
+    {
+        EmployeeId= leave.EmployeeId;
+        FromDate= leave.FromDate;
+        ToDate = leave.ToDate;
+    }
 }

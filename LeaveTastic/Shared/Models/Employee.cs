@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LeaveTastic.Shared.Models;
 
@@ -18,4 +17,16 @@ public partial class Employee
     public virtual ICollection<Leave> Leaves { get; } = new List<Leave>();
 
     public virtual Role? Role { get; set; }
+
+    public Employee() { }
+
+
+
+    public Employee(Employee employee)
+    {
+        Name = employee.Name;
+        ManagerId = employee.ManagerId;
+        RoleId = employee.RoleId;
+        LeaveDays = employee.LeaveDays;
+    }
 }

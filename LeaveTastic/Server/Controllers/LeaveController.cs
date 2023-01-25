@@ -29,30 +29,31 @@ namespace LeaveTastic.Server.Controllers
         [HttpGet("emp/{id}")]
         public IEnumerable<Leave>? GetEmployeeLeaves(int id)
         {
-            var t =  dbContext.Leaves.Where(x => x.EmployeeId == id).ToList();
+            var t = dbContext.Leaves.Where(x => x.EmployeeId == id).ToList();
             return t;
         }
 
-        [HttpPost("{id}")]
-        public void Post(int id, [FromBody] Leave leave)
+        [HttpPost]
+        public async Task<BaseResponse> Post([FromBody] Leave leave)
         {
-            dbContext.Leaves.Add(leave);
-            dbContext.SaveChanges();
+            await dbContext.Leaves.AddAsync(new(leave));
+            return new();
         }
 
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] Leave leave)
+        public async Task<BaseResponse> Put(int id, [FromBody] Leave leave)
         {
             dbContext.Leaves.Update(leave);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
+            return new();
         }
 
         [HttpDelete]
-        public void Delete(int id)
+        public async Task<BaseResponse> Delete(int id)
         {
             Leave? leave = dbContext.Leaves.Where(x => x.Id == id).FirstOrDefault();
             dbContext.Leaves.Remove(leave);
-            dbContext.SaveChanges();
+            return new();
         }
     }
 }

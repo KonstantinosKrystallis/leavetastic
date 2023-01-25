@@ -1,0 +1,38 @@
+﻿@inherits RadzenComponent
+
+<RadzenTemplateForm Data="leave" TItem="Leave" Submit="Accept">
+    <RadzenCard>
+        <RadzenRow>
+            <RadzenColumn>
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">From Date</RadzenText>
+                <RadzenDatePicker @bind-Value=@leave.FromDate DateFormat="d" Class="w-100" />
+                <RadzenText TextStyle="TextStyle.Subtitle2" TagName="TagName.H3">To Date</RadzenText>
+                <RadzenDatePicker @bind-Value=@leave.ToDate DateFormat="d" Class="w-100" />
+            </RadzenColumn>
+        </RadzenRow>
+        <RadzenStack class="rz-mt-4" Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.SpaceBetween">
+            <RadzenButton ButtonStyle="ButtonStyle.Success" ButtonType="ButtonType.Submit" Text="Submit"></RadzenButton>
+            <RadzenButton ButtonStyle="ButtonStyle.Warning" Click="Reject" Text="Cancel"></RadzenButton>
+        </RadzenStack>
+    </RadzenCard>
+</RadzenTemplateForm>
+
+@code {
+    [Inject]
+    HelperService helperService { get; set; } = default!;
+
+    Leave leave = new();
+
+    async Task Accept()
+    {
+        leave.EmployeeId = helperService.SelectedEmployee.Id;
+        leave.Employee = new(helperService.SelectedEmployee);
+        await helperService.HttpService.Post<Leave>("api/Leave/", leave, default!, true, "Request submitted.");
+        helperService.DialogService.Close(true);
+    }
+
+    void Reject()
+    {
+        helperService.DialogService.Close(false);
+    }
+}

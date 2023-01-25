@@ -1,15 +1,30 @@
-﻿@inherits RadzenComponent
+﻿@using LeaveTastic.Client.Pages.Dialogs;
+@inherits RadzenComponent
 
 <RadzenCard>
     <RadzenText TextStyle=TextStyle.DisplayH6 Text="Employee's Leaves"></RadzenText>
-
+    <RadzenButton class="rz-mb-3" Text="New Request" Icon="add_circle" Click="NewRequest"></RadzenButton>
     <RadzenDataGrid @ref=radzenDataGrid class="w-100" Data="leaves" TItem=Leave AllowSorting=true>
         <EmptyTemplate>
             <p style="color: lightgrey; font-size: 24px; text-align: center; margin: 2rem;">No records to display.</p>
         </EmptyTemplate>
         <Columns>
             <RadzenDataGridColumn TItem="Leave" Property="Id" Width="100px" Title="Id"> </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Leave" Property="DateOfLeave" Title="Date"> </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Leave" Property="FromDate" Title="From Date">
+                <Template Context="data">
+                    @(DateOnly.FromDateTime(data.FromDate))
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Leave" Property="ToDate" Title="To Date">
+                <Template Context="data">
+                    @(DateOnly.FromDateTime(data.ToDate))
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Leave" Title="Total Days">
+                <Template Context="data">
+                    @(((data.ToDate - data.FromDate).Days + 1).ToString())
+                </Template>
+            </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Leave" Property="IsApproved" Width="100px" Title="Approved"> </RadzenDataGridColumn>
         </Columns>
     </RadzenDataGrid>
@@ -19,7 +34,7 @@
     [Inject]
     HelperService helperService { get; set; } = default!;
 
-    private RadzenDataGrid<Leave>? radzenDataGrid { get; set; } = default!;
+    private RadzenDataGrid<Leave>? radzenDataGrid { get; set; }
 
     private Employee selectedEmploy { get; set; }
     private List<Leave> leaves { get; set; }
@@ -39,7 +54,7 @@
         await base.OnAfterRenderAsync(firstRender);
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
         helperService.SelectedEmployeeChanged -= EmploySelected;
     }
@@ -48,7 +63,7 @@
     {
         selectedEmploy = employee;
         await GetLeaves();
-        await radzenDataGrid.Reload();
+        await radzenDataGrid?.Reload();
         StateHasChanged();
     }
 
@@ -63,5 +78,13 @@
                 leaves.Add(item);
             }
         }
+    }
+
+    private async Task NewRequest()
+    {
+        await helperService.OpenDialog<NewRequest>("New request for leave", default);
+        await GetLeaves();
+        await radzenDataGrid?.Reload();
+        StateHasChanged();
     }
 }
