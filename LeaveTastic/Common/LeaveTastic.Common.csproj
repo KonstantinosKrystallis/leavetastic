@@ -21,4 +21,8 @@
     <ProjectReference Include="..\Shared\LeaveTastic.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\css\" />
+  </ItemGroup>
+
 </Project>
