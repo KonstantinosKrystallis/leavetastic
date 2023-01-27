@@ -70,14 +70,8 @@
     private async Task GetLeaves()
     {
         var result = await helperService.HttpService.Get<DataResponse<List<Leave>>>($"api/leave/emp/{selectedEmploy.Id}");
-        if (!result.HasError)
-        {
-            leaves = new();
-            foreach (var item in result.Data)
-            {
-                leaves.Add(item);
-            }
-        }
+        leaves = new();
+        leaves.AddRange(result.Data);
     }
 
     private async Task NewRequest()

@@ -23,13 +23,13 @@ namespace LeaveTastic.Common.Services
             _notificationService = notificationService;
         }
 
-        public virtual async Task<T> Get<T>(string uri, Dictionary<string, string> headers = null, bool showSuccessNotfication = false, string notificationMessage = successActionMessage) where T : notnull, new()
+        public virtual async Task<T> Get<T>(string uri, Dictionary<string, string> headers = null, bool showSuccessNotfication = false, string notificationMessage = successActionMessage) where T : BaseResponse, new()
         {
             var request = new HttpRequestMessage(HttpMethod.Get, BaseUrl + uri);
             return await Send<T>(request, headers, showSuccessNotfication, notificationMessage);
         }
 
-        public virtual async Task<T> Post<T>(string uri, object body = null, Dictionary<string, string> headers = null, bool showSuccessNotfication = false, string notificationMessage = successActionMessage) where T : notnull, new()
+        public virtual async Task<T> Post<T>(string uri, object body = null, Dictionary<string, string> headers = null, bool showSuccessNotfication = false, string notificationMessage = successActionMessage) where T : BaseResponse, new()
         {
             var request = new HttpRequestMessage(HttpMethod.Post, BaseUrl + uri);
             if (body != null)
@@ -39,7 +39,7 @@ namespace LeaveTastic.Common.Services
             return await Send<T>(request, headers, showSuccessNotfication, notificationMessage);
         }
 
-        public virtual async Task<T> Put<T>(string uri, object? body = null, Dictionary<string, string>? headers = null, bool showSuccessNotfication = false, string notificationMessage = successActionMessage) where T : notnull, new()
+        public virtual async Task<T> Put<T>(string uri, object? body = null, Dictionary<string, string>? headers = null, bool showSuccessNotfication = false, string notificationMessage = successActionMessage) where T : BaseResponse, new()
         {
             var request = new HttpRequestMessage(HttpMethod.Put, BaseUrl + uri);
             if (body != null)
@@ -49,7 +49,7 @@ namespace LeaveTastic.Common.Services
             return await Send<T>(request, headers, showSuccessNotfication, notificationMessage);
         }
 
-        public virtual async Task<T> Patch<T>(string uri, object? body = null, Dictionary<string, string> headers = null, bool showSuccessNotfication = false, string notificationMessage = successActionMessage) where T : notnull, new()
+        public virtual async Task<T> Patch<T>(string uri, object? body = null, Dictionary<string, string> headers = null, bool showSuccessNotfication = false, string notificationMessage = successActionMessage) where T : BaseResponse, new()
         {
             var request = new HttpRequestMessage(HttpMethod.Patch, BaseUrl + uri);
             if (body != null)
@@ -59,13 +59,13 @@ namespace LeaveTastic.Common.Services
             return await Send<T>(request, headers, showSuccessNotfication, notificationMessage);
         }
 
-        public virtual async Task<T> Delete<T>(string uri, Dictionary<string, string> headers = null, bool showSuccessNotfication = false, string notificationMessage = successActionMessage) where T : notnull, new()
+        public virtual async Task<T> Delete<T>(string uri, Dictionary<string, string> headers = null, bool showSuccessNotfication = false, string notificationMessage = successActionMessage) where T : BaseResponse, new()
         {
             var request = new HttpRequestMessage(HttpMethod.Delete, BaseUrl + uri);
             return await Send<T>(request, headers, showSuccessNotfication, notificationMessage);
         }
 
-        private async Task<T> Send<T>(HttpRequestMessage httpRequestMessage, Dictionary<string, string> headers = null, bool showSuccessNotfication = false, string notificationMessage = successActionMessage) where T : notnull, new()
+        private async Task<T> Send<T>(HttpRequestMessage httpRequestMessage, Dictionary<string, string> headers = null, bool showSuccessNotfication = false, string notificationMessage = successActionMessage) where T : BaseResponse, new()
         {
             if (headers?.Count > 0)
             {
@@ -77,7 +77,7 @@ namespace LeaveTastic.Common.Services
             return await BaseSend<T>(httpRequestMessage, showSuccessNotfication, notificationMessage);
         }
 
-        private async Task<T> BaseSend<T>(HttpRequestMessage httpRequestMessage, bool showSuccessNotfication = false, string notificationMessage = successActionMessage) where T : notnull, new()
+        private async Task<T> BaseSend<T>(HttpRequestMessage httpRequestMessage, bool showSuccessNotfication = false, string notificationMessage = successActionMessage) where T : BaseResponse, new()
         {
             T response = new();
             try
@@ -87,7 +87,7 @@ namespace LeaveTastic.Common.Services
                 response = await httpResponse.Content.ReadFromJsonAsync<T>();
                 if (response != null)
                 {
-                    if (httpResponse.IsSuccessStatusCode)
+                    if (!response.HasError)
                     {
                         if (showSuccessNotfication)
                         {
@@ -96,7 +96,7 @@ namespace LeaveTastic.Common.Services
                     }
                     else
                     {
-                        await ShowNotification(new() { Severity = NotificationSeverity.Error, Summary = "Server Error", Detail = httpResponse.ReasonPhrase, Duration = 10000 });
+                        await ShowNotification(new() { Severity = NotificationSeverity.Error, Summary = response.StatusCode.ToString(), Detail = response.Message, Duration = 10000 });
                     }
                 }
                 return response;

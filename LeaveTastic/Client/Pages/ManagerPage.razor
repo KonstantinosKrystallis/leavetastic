@@ -1,22 +1,72 @@
 ﻿@page "/manager"
 
-<h3>ManagerPage</h3>
+<h3>Manager Page</h3>
+
+<RadzenCard>
+    <RadzenText TextStyle=TextStyle.DisplayH6 Text="Subordinates' Leave Requests"></RadzenText>
+    <RadzenDataGrid class="w-100" Data="leaves" TItem=Leave AllowSorting=true>
+        <EmptyTemplate>
+            <p style="color: lightgrey; font-size: 24px; text-align: center; margin: 2rem;">No records to display.</p>
+        </EmptyTemplate>
+        <Columns>
+            <RadzenDataGridColumn TItem="Leave" Property="Id" Width="100px" Title="Id"> </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Leave" Property="Employee.Name" Title="Employ Name"> </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Leave" Property="FromDate" Width="100px" Title="From Date">
+                <Template Context="data">
+                    @(DateOnly.FromDateTime(data.FromDate))
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Leave" Property="ToDate" Width="200px" Title="To Date">
+                <Template Context="data">
+                    @(DateOnly.FromDateTime(data.ToDate))
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Leave" Title="Total Days">
+                <Template Context="data">
+                    @(((data.ToDate - data.FromDate).Days + 1).ToString())
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Leave" Property="IsApproved" Width="200px" Title="Actions">
+                <Template Context="data">
+                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
+                        <RadzenButton ButtonStyle=ButtonStyle.Success Size="ButtonSize.Small" Text="Aprove" Icon="done"></RadzenButton>
+                        <RadzenButton ButtonStyle=ButtonStyle.Danger Size="ButtonSize.Small" Text="Reject" Icon="close"></RadzenButton>
+                    </RadzenStack>
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+</RadzenCard>
 
 @code {
     [Inject]
     HelperService helperService { get; set; } = default!;
 
+    private List<Leave> leaves { get; set; } = new();
+
+    private Employee manager { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
 
-        int? roleId = helperService.SelectedEmployee.RoleId;
+        manager = helperService.SelectedEmployee;
+
+        int? roleId = manager?.RoleId;
 
         if (roleId != 2 && roleId != 3)
         {
             helperService.NotificationService.Notify(NotificationSeverity.Warning, "Invalid user.", "Please select a manager user,in order to view this page", 6000);
             helperService.NavigationManager.NavigateTo("/");
         }
+
+        await GetLeaves();
     }
 
+    private async Task GetLeaves()
+    {
+        var result = await helperService.HttpService.Get<DataResponse<List<Leave>>>($"api/leave/mng/{manager?.Id}");
+        leaves = new();
+        leaves.AddRange(result.Data);
+    }
 }

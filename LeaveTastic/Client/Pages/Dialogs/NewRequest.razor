@@ -27,7 +27,7 @@
     {
         leave.EmployeeId = helperService.SelectedEmployee.Id;
         leave.Employee = new(helperService.SelectedEmployee);
-        await helperService.HttpService.Post<Leave>("api/Leave/", leave, default!, true, "Request submitted.");
+        await helperService.HttpService.Post<BaseResponse>("api/Leave/", leave, default!, true, "Request submitted.");
         helperService.DialogService.Close(true);
     }
 

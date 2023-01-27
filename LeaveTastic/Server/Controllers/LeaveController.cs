@@ -1,6 +1,8 @@
 ﻿using LeaveTastic.Server.Data;
 using LeaveTastic.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace LeaveTastic.Server.Controllers
 {
@@ -29,7 +31,33 @@ namespace LeaveTastic.Server.Controllers
         [HttpGet("emp/{id}")]
         public DataResponse<IEnumerable<Leave>> GetEmployeeLeaves(int id)
         {
-            return new() { Data = dbContext.Leaves.Where(x => x.EmployeeId == id).ToList() };
+            try
+            {
+                return new() { Data = dbContext.Leaves.Where(x => x.EmployeeId == id).ToList() };
+            }
+            catch (Exception e)
+            {
+                return new() { Exception = e, HasError = true, Message = "Error while getting employ's leaves.", StatusCode = HttpStatusCode.InternalServerError };
+            }
+        }
+
+        [HttpGet("mng/{id}")]
+        public DataResponse<IEnumerable<Leave>> GetSubordinatesLeaves(int id)
+        {
+            try
+            {
+                var leavesQuery = from leave in dbContext.Leaves where leave.Employee.ManagerId == id select leave;
+                var leaves = leavesQuery.Include(x => x.Employee).ToList();
+
+                //var employeesQuery = from emp in dbContext.Employees where emp.ManagerId == id select emp.Id;
+                //var leaves = dbContext.Leaves.Where(x => employeesQuery.Contains(x.EmployeeId)).ToList();
+
+                return new() { Data = leaves };
+            }
+            catch (Exception e)
+            {
+                return new() { Exception = e, HasError = true, Message = "Error while getting surbordinates' leaves.", StatusCode = HttpStatusCode.InternalServerError };
+            }
         }
 
         [HttpPost]
