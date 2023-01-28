@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-
-namespace LeaveTastic.Shared.Models;
+﻿namespace LeaveTastic.Shared.Models;
 
 public partial class Employee
 {
@@ -14,13 +12,15 @@ public partial class Employee
 
     public int LeaveDays { get; set; }
 
+    public virtual ICollection<Employee> InverseManager { get; } = new List<Employee>();
+
     public virtual ICollection<Leave> Leaves { get; } = new List<Leave>();
+
+    public virtual Employee? Manager { get; set; }
 
     public virtual Role? Role { get; set; }
 
     public Employee() { }
-
-
 
     public Employee(Employee employee)
     {

@@ -12,8 +12,8 @@ namespace LeaveTastic.Server.Controllers
     [ApiController]
     public class EmployeeController : ControllerBase
     {
-        private readonly LeaveTasticDatabaseContext dbContext;
-        public EmployeeController(LeaveTasticDatabaseContext dbContext)
+        private readonly ApplicationDbContext dbContext;
+        public EmployeeController(ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
         }

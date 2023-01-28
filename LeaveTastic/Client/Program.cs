@@ -32,6 +32,3 @@ builder.Services.AddScoped<HelperService>();
 builder.Services.AddScoped<HttpService>();
 
 await builder.Build().RunAsync();
-
-
-//PM> Scaffold-DbContext "Server=.\SQLExpress;Database=SchoolDB;Trusted_Connection=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models

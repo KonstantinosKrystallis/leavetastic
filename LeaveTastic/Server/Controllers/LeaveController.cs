@@ -10,8 +10,8 @@ namespace LeaveTastic.Server.Controllers
     [ApiController]
     public class LeaveController : ControllerBase
     {
-        private readonly LeaveTasticDatabaseContext dbContext;
-        public LeaveController(LeaveTasticDatabaseContext dbContext)
+        private readonly ApplicationDbContext dbContext;
+        public LeaveController(ApplicationDbContext dbContext)
         {
             this.dbContext = dbContext;
         }
@@ -63,7 +63,7 @@ namespace LeaveTastic.Server.Controllers
         [HttpPost]
         public async Task<BaseResponse> Post([FromBody] Leave leave)
         {
-            await dbContext.Leaves.AddAsync(new(leave));
+            //await dbContext.Leaves.AddAsync(new(leave));
             await dbContext.SaveChangesAsync();
             return new();
         }

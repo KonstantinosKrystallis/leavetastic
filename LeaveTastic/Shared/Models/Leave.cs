@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.InteropServices;
-using System.Runtime.Serialization;
-
-namespace LeaveTastic.Shared.Models;
+﻿namespace LeaveTastic.Shared.Models;
 
 public partial class Leave
 {
@@ -24,10 +18,10 @@ public partial class Leave
 
     public Leave() { }
 
-    public Leave (Leave leave)
+    public Leave(Leave leave)
     {
-        EmployeeId= leave.EmployeeId;
-        FromDate= leave.FromDate;
+        EmployeeId = leave.EmployeeId;
+        FromDate = leave.FromDate;
         ToDate = leave.ToDate;
     }
 }

@@ -1,155 +1,141 @@
-﻿using LeaveTastic.Shared.Models.Old;
+﻿using System;
+using System.Collections.Generic;
+using LeaveTastic.Shared.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace LeaveTastic.Server.Data
+namespace LeaveTastic.Server.Data;
+
+public partial class ApplicationDbContext : DbContext
 {
-    //public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
-    //{
-    //    public ApplicationDbContext(
-    //        DbContextOptions options,
-    //        IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
-    //    {
-    //    }
-    //}
-
-    public class ApplicationDbContext : DbContext
+    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        : base(options)
     {
-        public DbSet<User> Users { get; set; }
-        public DbSet<Role> Roles { get; set; }
-        public DbSet<UserRole> UserRoles { get; set; }
-        public DbSet<Leave> Leaves { get; set; }
-        public DbSet<UserLeave> UserLeaves { get; set; }
-
-        public ApplicationDbContext(DbContextOptions options) : base(options)
-        {
-        }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-
-            #region Roles
-            modelBuilder.Entity<Role>().HasKey(c => c.Id);
-            modelBuilder.Entity<Role>().HasMany(c => c.Users).WithOne(c => c.Role).HasForeignKey(c => c.RoleId);
-            modelBuilder.Entity<Role>().HasData(
-                new Role
-                {
-                    Id = 1,
-                    Name = "Employ",
-                },
-                new Role
-                {
-                    Id = 2,
-                    Name = "Department Manager",
-                },
-                new Role
-                {
-                    Id = 3,
-                    Name = "Human Resources Manager",
-                }
-            );
-            #endregion
-
-            #region Users
-            modelBuilder.Entity<User>().HasKey(c => c.Id);
-            modelBuilder.Entity<User>().HasOne(c => c.Role).WithOne(c => c.User);
-            modelBuilder.Entity<User>().HasData(
-                new User
-                {
-                    Id = 1,
-                    Name = "Employ 1",
-                    ManagerId = 6,
-
-                }, new User
-                {
-                    Id = 2,
-                    Name = "Employ 2",
-                    ManagerId = 6,
-
-                }, new User
-                {
-                    Id = 3,
-                    Name = "Employ 3",
-                    ManagerId = 6,
-
-                }, new User
-                {
-                    Id = 4,
-                    Name = "Employ 4",
-                    ManagerId = 7
-
-                }, new User
-                {
-                    Id = 5,
-                    Name = "Employ 5",
-                    ManagerId = 8,
-
-                }, new User
-                {
-                    Id = 6,
-                    Name = "Department Manager 1",
-                }, new User
-                {
-                    Id = 7,
-                    Name = "Department Manager 2",
-                }, new User
-                {
-                    Id = 8,
-                    Name = "Human Resources Manager",
-                }
-            );
-            #endregion
-
-            #region UserRole
-            modelBuilder.Entity<UserRole>().HasKey(c => new { c.UserId, c.RoleId });
-            modelBuilder.Entity<UserRole>().HasOne(c => c.Role).WithMany(c => c.Users).HasForeignKey(c => c.RoleId);
-            modelBuilder.Entity<UserRole>().HasData(
-                new UserRole
-                {
-                    RoleId = 1,
-                    UserId = 1,
-                }, new UserRole
-                {
-                    RoleId = 1,
-                    UserId = 2,
-                }, new UserRole
-                {
-                    RoleId = 1,
-                    UserId = 3,
-                }, new UserRole
-                {
-                    RoleId = 1,
-                    UserId = 4,
-                }, new UserRole
-                {
-                    RoleId = 1,
-                    UserId = 5,
-                }, new UserRole
-                {
-                    RoleId = 2,
-                    UserId = 6,
-                }, new UserRole
-                {
-                    RoleId = 2,
-                    UserId = 7,
-                }, new UserRole
-                {
-                    RoleId = 3,
-                    UserId = 8,
-                }
-            );
-            #endregion
-
-            #region Leaves
-            modelBuilder.Entity<Shared.Models.Leave>().HasKey(c => c.Id);
-            //modelBuilder.Entity<Leave>().HasOne(c => c.User).WithMany(c => c.Leaves).OnDelete(DeleteBehavior.ClientCascade);
-            #endregion
-
-            #region UserLeave
-            modelBuilder.Entity<UserLeave>().HasKey(c => new { c.UserId, c.LeaveId });
-            //modelBuilder.Entity<UserLeave>().HasOne(c => c.User).WithMany(c => c.Leaves).HasForeignKey(c => c.UserId);
-            modelBuilder.Entity<UserLeave>().HasOne(c => c.User).WithMany(c => c.Leaves).OnDelete(DeleteBehavior.ClientCascade);
-            #endregion
-        }
     }
+
+    public virtual DbSet<Employee> Employees { get; set; }
+
+    public virtual DbSet<Leave> Leaves { get; set; }
+
+    public virtual DbSet<Role> Roles { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Employee>(entity =>
+        {
+            entity.ToTable("Employee");
+
+            entity.HasIndex(e => e.RoleId, "IX_Employee_RoleId");
+
+            entity.Property(e => e.LeaveDays).HasDefaultValueSql("((20))");
+            entity.Property(e => e.RoleId).HasDefaultValueSql("((1))");
+
+            entity.HasOne(d => d.Manager).WithMany(p => p.InverseManager)
+                .HasForeignKey(d => d.ManagerId)
+                .HasConstraintName("FK_Employee_ManagerId");
+
+            entity.HasOne(d => d.Role).WithMany(p => p.Employees)
+                .HasForeignKey(d => d.RoleId)
+                .HasConstraintName("FK_Employee_RoleId");
+        });
+
+        modelBuilder.Entity<Leave>(entity =>
+        {
+            entity.ToTable("Leave");
+
+            entity.HasIndex(e => e.EmployeeId, "IX_Leave_EmployeeId");
+
+            entity.Property(e => e.FromDate).HasDefaultValueSql("(getdate())");
+            entity.Property(e => e.IsApproved)
+                .IsRequired()
+                .HasDefaultValueSql("(CONVERT([bit],(0)))");
+            entity.Property(e => e.IsDeleted)
+                .IsRequired()
+                .HasDefaultValueSql("(CONVERT([bit],(0)))");
+            entity.Property(e => e.ToDate).HasDefaultValueSql("(getdate())");
+
+            entity.HasOne(d => d.Employee).WithMany(p => p.Leaves)
+                .HasForeignKey(d => d.EmployeeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Leave_EmployeeId");
+        });
+
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.ToTable("Role");
+        });
+
+        modelBuilder.Entity<Role>().HasData(
+        new Role
+        {
+            Id = 1,
+            Name = "Employ",
+        }, new Role
+        {
+            Id = 2,
+            Name = "Department Manager",
+        }, new Role
+        {
+            Id = 3,
+            Name = "Human Resources Manager",
+        }
+        );
+
+        modelBuilder.Entity<Employee>().HasData(
+        new Employee
+        {
+            Id = 1,
+            Name = "Employ 1",
+            RoleId = 1,
+            ManagerId = 6,
+
+        }, new Employee
+        {
+            Id = 2,
+            Name = "Employ 2",
+            RoleId = 1,
+            ManagerId = 6,
+
+        }, new Employee
+        {
+            Id = 3,
+            Name = "Employ 3",
+            RoleId = 1,
+            ManagerId = 6,
+
+        }, new Employee
+        {
+            Id = 4,
+            Name = "Employ 4",
+            RoleId = 1,
+            ManagerId = 7
+
+        }, new Employee
+        {
+            Id = 5,
+            Name = "Employ 5",
+            RoleId = 1,
+            ManagerId = 8,
+
+        }, new Employee
+        {
+            Id = 6,
+            Name = "Department Manager 1",
+            RoleId = 2,
+        }, new Employee
+        {
+            Id = 7,
+            Name = "Department Manager 2",
+            RoleId = 2,
+        }, new Employee
+        {
+            Id = 8,
+            Name = "Human Resources Manager",
+            RoleId = 3,
+        }
+           );
+
+        OnModelCreatingPartial(modelBuilder);
+    }
+
+    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
