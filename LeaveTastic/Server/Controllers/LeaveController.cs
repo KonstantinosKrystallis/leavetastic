@@ -2,7 +2,9 @@
 using LeaveTastic.Shared.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Packaging;
 using System.Net;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace LeaveTastic.Server.Controllers
 {
@@ -33,7 +35,7 @@ namespace LeaveTastic.Server.Controllers
         {
             try
             {
-                return new() { Data = dbContext.Leaves.Where(x => x.EmployeeId == id).ToList() };
+                return new() { Data = dbContext.Leaves.Where(x => x.EmployeeId == id && x.ToDate > DateTime.Today).ToList() };
             }
             catch (Exception e)
             {
@@ -46,7 +48,7 @@ namespace LeaveTastic.Server.Controllers
         {
             try
             {
-                var leavesQuery = from leave in dbContext.Leaves where leave.Employee.ManagerId == id select leave;
+                var leavesQuery = from leave in dbContext.Leaves where leave.Employee.ManagerId == id && leave.ToDate > DateTime.Today select leave;
                 var leaves = leavesQuery.Include(x => x.Employee).ToList();
 
                 //var employeesQuery = from emp in dbContext.Employees where emp.ManagerId == id select emp.Id;
@@ -60,10 +62,31 @@ namespace LeaveTastic.Server.Controllers
             }
         }
 
+        [HttpGet("hr")]
+        public DataResponse<IEnumerable<Leave>> GetAllApprovedLeaves()
+        {
+            try
+            {
+                var leaves = dbContext.Leaves.Where(x => x.IsApproved == true).ToList();
+
+                return new() { Data = leaves };
+            }
+            catch (Exception e)
+            {
+                return new() { Exception = e, HasError = true, Message = "Error while getting surbordinates' leaves.", StatusCode = HttpStatusCode.InternalServerError };
+            }
+        }
+
         [HttpPost]
         public async Task<BaseResponse> Post([FromBody] Leave leave)
         {
-            //await dbContext.Leaves.AddAsync(new(leave));
+            await dbContext.Leaves.AddAsync(new(leave));
+            Employee? employee = await dbContext.Employees.Where(x => x.Id == leave.EmployeeId).FirstOrDefaultAsync();
+            if (employee != null)
+            {
+                employee.LeaveDays -= (leave.ToDate - leave.FromDate).Days + 1;
+                dbContext.Employees.Update(employee);
+            }
             await dbContext.SaveChangesAsync();
             return new();
         }
@@ -72,15 +95,30 @@ namespace LeaveTastic.Server.Controllers
         public async Task<BaseResponse> Put(int id, [FromBody] Leave leave)
         {
             dbContext.Leaves.Update(leave);
+            if (leave.IsDeleted == true)
+            {
+                Employee? employee = await dbContext.Employees.Where(x => x.Id == leave.EmployeeId).FirstOrDefaultAsync();
+                if (employee != null)
+                {
+                    employee.LeaveDays += (leave.ToDate - leave.FromDate).Days + 1;
+                    dbContext.Employees.Update(employee);
+                }
+            }
             await dbContext.SaveChangesAsync();
             return new();
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         public async Task<BaseResponse> Delete(int id)
         {
             Leave? leave = dbContext.Leaves.Where(x => x.Id == id).FirstOrDefault();
             dbContext.Leaves.Remove(leave);
+            Employee? employee = await dbContext.Employees.Where(x => x.Id == leave.EmployeeId).FirstOrDefaultAsync();
+            if (employee != null)
+            {
+                employee.LeaveDays += (leave.ToDate - leave.FromDate).Days + 1;
+                dbContext.Employees.Update(employee);
+            }
             await dbContext.SaveChangesAsync();
             return new();
         }

@@ -2,12 +2,47 @@
 
 <RadzenCard class="d-flex align-items-center ">
     <RadzenText class="my-0 mx-3" TextStyle=TextStyle.DisplayH6 Text="Select user"></RadzenText>
-    <RadzenDropDown TValue=int Data="employees" TextProperty="Name" ValueProperty="Id" Value="helperService.SelectedEmployee.Id" ValueChanged="EmployeeSelected" />
+    <RadzenDropDown TValue=int Data="employees" TextProperty="Name" ValueProperty="Id" Value="employee.Id" ValueChanged="EmployeeSelected" />
 </RadzenCard>
 
-@if (helperService.SelectedEmployee.RoleId != null)
+@if (!String.IsNullOrWhiteSpace(employee.Name))
 {
-    <EmployPage></EmployPage>
+    <RadzenCard>
+        <RadzenStack Orientation="Orientation.Vertical">
+            <RadzenRow>
+                <RadzenColumn Size="2">
+                    <RadzenLabel Text="Employee's Id" />
+                </RadzenColumn>
+                <RadzenColumn Size="8">
+                    <RadzenTextBox class="w-50" ReadOnly=true Value=@employee.Id.ToString() />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow>
+                <RadzenColumn Size="2">
+                    <RadzenLabel Text="Employee's name" />
+                </RadzenColumn>
+                <RadzenColumn Size="8">
+                    <RadzenTextBox class="w-50" ReadOnly=true Value=@employee.Name />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow>
+                <RadzenColumn Size="2">
+                    <RadzenLabel Text="Employee's Manager" />
+                </RadzenColumn>
+                <RadzenColumn Size="8">
+                    <RadzenTextBox class="w-50" ReadOnly=true Value=@employee.Manager?.Name />
+                </RadzenColumn>
+            </RadzenRow>
+            <RadzenRow>
+                <RadzenColumn Size="2">
+                    <RadzenLabel Text="Remaining Days of Leave" />
+                </RadzenColumn>
+                <RadzenColumn Size="8">
+                    <RadzenTextBox class="w-50" ReadOnly=true Value=@helperService.SelectedEmployee.LeaveDays.ToString() />
+                </RadzenColumn>
+            </RadzenRow>
+        </RadzenStack>
+    </RadzenCard>
 }
 else
 {
@@ -21,6 +56,7 @@ else
     HelperService helperService { get; set; } = default!;
 
     private List<Employee> employees { get; set; } = new();
+    private Employee? employee { get; set; } = new();
 
     private bool isVisible = true;
 
@@ -33,11 +69,16 @@ else
         {
             employees.AddRange(response.Data);
         }
+
+        if (!String.IsNullOrWhiteSpace(helperService.SelectedEmployee.Name))
+        {
+            employee = employees.Where(x => x.Id == helperService.SelectedEmployee.Id).FirstOrDefault();
+        }
     }
 
     private async Task EmployeeSelected(int employeeId)
     {
-        Employee? employee = employees.Where(x => x.Id == employeeId).FirstOrDefault();
+        employee = employees.Where(x => x.Id == employeeId).FirstOrDefault();
         await helperService.SelectEmployee(employee);
         StateHasChanged();
     }

@@ -2,6 +2,7 @@
 using LeaveTastic.Common.Components;
 using LeaveTastic.Shared.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using Radzen;
 
 namespace LeaveTastic.Common.Services
@@ -20,18 +21,23 @@ namespace LeaveTastic.Common.Services
         public readonly ContextMenuService ContextMenuService;
 
         public readonly NavigationManager NavigationManager;
+        public readonly IJSRuntime JsRuntime;
 
         public readonly HttpService HttpService;
 
+        public readonly JsHelperService JsHelperService;
+
         public HelperService(DialogService dialogService, NotificationService notificationService, TooltipService tooltipService, ContextMenuService contextMenuService,
-            NavigationManager navigationManager, HttpService httpService)
+            NavigationManager navigationManager, IJSRuntime jsRuntime, HttpService httpService, JsHelperService jsHelperService)
         {
             DialogService = dialogService;
             NotificationService = notificationService;
             TooltipService = tooltipService;
             ContextMenuService = contextMenuService;
             NavigationManager = navigationManager;
+            JsRuntime = jsRuntime;
             HttpService = httpService;
+            JsHelperService = jsHelperService;
         }
 
         #endregion

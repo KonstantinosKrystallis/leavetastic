@@ -1,11 +1,10 @@
-﻿@page "/employee"
-@using LeaveTastic.Client.Pages.Dialogs;
+﻿@using LeaveTastic.Client.Pages.Dialogs;
 @inherits RadzenComponent
 
 <RadzenCard>
     <RadzenText TextStyle=TextStyle.DisplayH6 Text="Employee's Leaves"></RadzenText>
     <RadzenButton class="rz-mb-3" Text="New Request" Icon="add_circle" Click="NewRequest"></RadzenButton>
-    <RadzenDataGrid @ref=radzenDataGrid class="w-100" Data="leaves" TItem=Leave AllowSorting=true Density="Density.Compact">
+    <RadzenDataGrid @ref=radzenDataGrid class="w-100" Data="leaves" TItem=Leave AllowSorting=true>
         <EmptyTemplate>
             <p style="color: lightgrey; font-size: 24px; text-align: center; margin: 2rem;">No records to display.</p>
         </EmptyTemplate>
@@ -26,20 +25,7 @@
                     @(((data.ToDate - data.FromDate).Days + 1).ToString())
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Leave" Width="100px">
-                <Template Context="data">
-                    <RadzenStack JustifyContent="JustifyContent.Center" AlignItems="AlignItems.Center">
-                        @if (data.IsApproved.HasValue && !data.IsApproved.Value)
-                        {
-                            <RadzenButton Size="ButtonSize.ExtraSmall" Text="Cancel" Icon="cancel" Click="()=>Cancel(data)"></RadzenButton>
-                        }
-                        else
-                        {
-                            <RadzenText TextStyle="TextStyle.Body2" Text="Approved" />
-                        }
-                    </RadzenStack>
-                </Template>
-            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Leave" Property="IsApproved" Width="100px" Title="Approved"> </RadzenDataGridColumn>
         </Columns>
     </RadzenDataGrid>
 </RadzenCard>
@@ -100,13 +86,6 @@
     {
         await helperService.OpenDialog<NewRequest>("New request for leave", default);
         await GetLeaves();
-        await radzenDataGrid?.Reload();
-        StateHasChanged();
-    }
-
-    private async Task Cancel(Leave leave)
-    {
-        await helperService.HttpService.Delete<BaseResponse>($"api/leave/{leave.Id}");
         await radzenDataGrid?.Reload();
         StateHasChanged();
     }

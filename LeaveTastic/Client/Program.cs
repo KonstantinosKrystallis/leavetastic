@@ -31,4 +31,6 @@ builder.Services.AddScoped<HelperService>();
 //HttpService
 builder.Services.AddScoped<HttpService>();
 
+builder.Services.AddScoped<JsHelperService>();
+
 await builder.Build().RunAsync();

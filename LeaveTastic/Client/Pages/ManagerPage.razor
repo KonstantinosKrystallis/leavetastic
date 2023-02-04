@@ -1,36 +1,35 @@
 ﻿@page "/manager"
 
-<h3>Manager Page</h3>
-
 <RadzenCard>
     <RadzenText TextStyle=TextStyle.DisplayH6 Text="Subordinates' Leave Requests"></RadzenText>
-    <RadzenDataGrid class="w-100" Data="leaves" TItem=Leave AllowSorting=true>
+    <RadzenDataGrid class="w-100" Data="leaves" TItem=Leave AllowGrouping="true" AllowFiltering="true" FilterMode="FilterMode.Advanced" AllowSorting=true
+                    AllowVirtualization=true Render="@OnRender" Style="@($"max-height: {height}px")" Density="Density.Compact">
         <EmptyTemplate>
             <p style="color: lightgrey; font-size: 24px; text-align: center; margin: 2rem;">No records to display.</p>
         </EmptyTemplate>
         <Columns>
-            <RadzenDataGridColumn TItem="Leave" Property="Id" Width="100px" Title="Id"> </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="Leave" Property="Id" Width="100px" Title="Id" Groupable=false> </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="Leave" Property="Employee.Name" Title="Employ Name"> </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Leave" Property="FromDate" Width="100px" Title="From Date">
+            <RadzenDataGridColumn TItem="Leave" Property="FromDate" Width="120px" Title="From Date" SortOrder="SortOrder.Ascending" Groupable=false>
                 <Template Context="data">
                     @(DateOnly.FromDateTime(data.FromDate))
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Leave" Property="ToDate" Width="200px" Title="To Date">
+            <RadzenDataGridColumn TItem="Leave" Property="ToDate" Width="120px" Title="To Date" Groupable=false>
                 <Template Context="data">
                     @(DateOnly.FromDateTime(data.ToDate))
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Leave" Title="Total Days">
+            <RadzenDataGridColumn TItem="Leave" Width="150px" Title="Total Days" Groupable=false>
                 <Template Context="data">
                     @(((data.ToDate - data.FromDate).Days + 1).ToString())
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="Leave" Property="IsApproved" Width="200px" Title="Actions">
+            <RadzenDataGridColumn TItem="Leave" Property="IsApproved" Width="200px" Title="Actions" Filterable=false Sortable=false Groupable=false>
                 <Template Context="data">
                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Center">
-                        <RadzenButton ButtonStyle=ButtonStyle.Success Size="ButtonSize.Small" Text="Aprove" Icon="done"></RadzenButton>
-                        <RadzenButton ButtonStyle=ButtonStyle.Danger Size="ButtonSize.Small" Text="Reject" Icon="close"></RadzenButton>
+                        <RadzenButton ButtonStyle=ButtonStyle.Success Size="ButtonSize.ExtraSmall" Text="Approve" Icon="done" Click="()=>Approve(data)"></RadzenButton>
+                        <RadzenButton ButtonStyle=ButtonStyle.Danger Size="ButtonSize.ExtraSmall" Text="Reject" Icon="close" Click="()=>Reject(data)"></RadzenButton>
                     </RadzenStack>
                 </Template>
             </RadzenDataGridColumn>
@@ -46,6 +45,8 @@
 
     private Employee manager { get; set; }
 
+    private double height { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -60,13 +61,43 @@
             helperService.NavigationManager.NavigateTo("/");
         }
 
+
         await GetLeaves();
+
+        height = await helperService.JsHelperService.GetElementHeight(".rz-body") - 110 - 400;
     }
+
+    #region Data Grid Actions
+
+    void OnRender(DataGridRenderEventArgs<Leave> args)
+    {
+        if (args.FirstRender)
+        {
+            args.Grid.Groups.Add(new GroupDescriptor() { Property = "Employee.Name", SortOrder = SortOrder.Ascending });
+            StateHasChanged();
+        }
+    }
+
+    #endregion
 
     private async Task GetLeaves()
     {
         var result = await helperService.HttpService.Get<DataResponse<List<Leave>>>($"api/leave/mng/{manager?.Id}");
         leaves = new();
         leaves.AddRange(result.Data);
+    }
+
+    private async Task Approve(Leave leave)
+    {
+        leave.IsApproved = true;
+        leave.IsDeleted = false;
+        await helperService.HttpService.Put<BaseResponse>($"api/leave/{leave.Id}", leave);
+    }
+
+    private async Task Reject(Leave leave)
+    {
+        leave.IsApproved = false;
+        leave.IsDeleted = true;
+        await helperService.HttpService.Put<BaseResponse>($"api/leave/{leave.Id}", leave);
     }
 }
